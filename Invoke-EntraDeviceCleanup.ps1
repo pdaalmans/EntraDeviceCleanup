@@ -8,7 +8,7 @@ Description: Report on, disable and delete stale Entra ID device registrations.
              - Never touches Autopilot-registered, Intune-managed (delete only) or hybrid joined devices
              - Posts a summary Adaptive Card to a Teams Workflows webhook
 
-Runtime:     Azure Automation, PowerShell 7.4 (also works on 5.1)
+Runtime:     Azure Automation, PowerShell 7.4 
 Modules:     Microsoft.Graph.Authentication
              Microsoft.Graph.Identity.DirectoryManagement
              Microsoft.Graph.DeviceManagement
