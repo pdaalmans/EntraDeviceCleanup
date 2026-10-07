@@ -16,8 +16,6 @@ Modules:     Microsoft.Graph.Authentication
 Graph permissions (application):
              Device.ReadWrite.All
              DeviceManagementManagedDevices.Read.All
-Entra role on the identity:
-             Cloud Device Administrator (needed to set accountEnabled and to delete devices app-only)
 
 Automation variables:
   CleanUPReadOnly       Boolean  true = report only (default true)
@@ -33,8 +31,7 @@ Automation variables:
 Release notes:
   1.0   Original published version.
   1.02  Read-only mode, Graph SDK, Teams message, using Claude AI.
-  2.0   Managed identity support, delete via Cloud Device Administrator role,
-        fixed Intune match (DeviceId instead of non-existent ObjectId),
+  2.0   Managed identity support, fixed Intune match (DeviceId instead of non-existent ObjectId),
         Intune devices fetched once with -All, devices without sign-in date handled,
         already disabled devices no longer re-disabled, hybrid joined exclusion,
         delete safety cap, per-device error handling, JSON built with ConvertTo-Json,
@@ -189,7 +186,7 @@ if ($failed.Count) {
     Write-Output "--- Failed ($($failed.Count)) ---"
     $failed | Format-Table -AutoSize -Wrap | Out-String -Width 250 | Write-Output
     if ($failed.Error -match 'Insufficient privileges|Authorization_RequestDenied|403') {
-        Write-Warning "Access denied: assign the Cloud Device Administrator role to the runbook identity."
+        Write-Warning "Access denied: check permissions of the runbook identity."
     }
 }
 #endregion

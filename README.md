@@ -56,8 +56,7 @@ No interactive user sign-in or client secret is used by the certificate authenti
    | `DeviceManagementManagedDevices.Read.All` | Read Intune-managed devices to exclude them from deletion. |
 
 5. Grant administrator consent for your tenant. These are **application**, not delegated, permissions.
-6. Under **Roles & admins > Cloud Device Administrator > Add assignments**, assign the application's **service principal** (the enterprise application) the Cloud Device Administrator role. The script expects this role for app-only device disable/delete operations. Assigning an Azure subscription/resource-group RBAC role is not a substitute.
-7. Under the app registration's **Certificates & secrets > Certificates**, upload the public certificate (`.cer`). Never upload the private-key `.pfx` here.
+6. Under the app registration's **Certificates & secrets > Certificates**, upload the public certificate (`.cer`). Never upload the private-key `.pfx` here.
 
 Use the same application and tenant IDs in the Automation variables below.
 
@@ -145,11 +144,13 @@ Recommended initial configuration:
 - Use positive integers for day thresholds. Legacy negative day values are accepted and converted to their absolute values. The runbook stops if the delete threshold is not greater than the disable threshold.
 - Use a nonnegative delete cap. A cap of `0` prevents deletion whenever there are delete candidates.
 
+![Automation Account Variables](image.png)
+
 ### Authentication selection and managed identity alternative
 
 Certificate authentication is used **only when `CleanUPAPPID`, `CleanUPTenantID`, and `CleanUPCert` are all populated**. If any one is missing or empty, the script attempts `Connect-MgGraph -Identity` instead; it does not report an incomplete certificate configuration.
 
-To intentionally use managed identity, leave all three authentication variables absent or empty, enable the Automation account's system-assigned managed identity, and grant its service principal the same Microsoft Graph application permissions and Cloud Device Administrator role. Graph application permissions must be assigned to that service principal; Azure RBAC assignments alone do not grant Graph access. Omit the certificate bootstrap when using managed identity.
+To intentionally use managed identity, leave all three authentication variables absent or empty, enable the Automation account's system-assigned managed identity, and grant its service principal the same Microsoft Graph application permissions. Graph application permissions must be assigned to that service principal; Azure RBAC assignments alone do not grant Graph access. Omit the certificate bootstrap when using managed identity.
 
 ## Deploy, test, and schedule the runbook
 
@@ -178,7 +179,7 @@ The card includes the execution mode, thresholds, candidate counts, exclusions, 
 | --- | --- |
 | Unexpected managed identity connection | Verify all three certificate authentication variables are populated. |
 | Certificate not found or authentication fails | Verify the thumbprint, certificate store availability to the job, private-key access, expiry, tenant/client IDs, and matching public certificate on the app registration. |
-| Graph access denied / `403` | Verify application permissions, tenant admin consent, and the Cloud Device Administrator assignment to the correct service principal. |
+| Graph access denied / `403` | Verify application permissions, and tenant admin consent |
 | Invalid retention thresholds | Ensure the absolute value of `CleanUPDeleteDays` is greater than that of `CleanUPDisableDays`. |
 | Deletion cap warning | Review the full candidate list before changing the cap. The script skips all deletions, rather than deleting only the first candidates up to the cap. |
 | Teams notification warning | Verify the webhook URL, workflow trigger authentication, workflow status, and Adaptive Card handling. |
